@@ -3,12 +3,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-m_Packet *m_Packet_constructor(unsigned int size) {
+m_Packet *m_Packet_constructor(uint8_t *data, uint32_t size) {
 	m_Packet *pck = malloc(sizeof(*pck));
 	
-	pck->size = 0;
+	pck->size = size;
 	pck->pos	= 0;
-	pck->data	= malloc(size);
+	pck->data	= data;
 
 	return pck;
 }

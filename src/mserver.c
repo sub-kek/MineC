@@ -77,8 +77,7 @@ void mserver_start(MSS) {
 		}
 		printf("\n");
 
-		m_Packet *packet = m_Packet_constructor(len);
-		packet->data = buffer;
+		m_Packet *packet = m_Packet_constructor(buffer, len);
 
 		printf("Packet lenght: %d\n", m_Packet_read_int(packet));
 		printf("Packet ID: 0x%02x\n", m_Packet_read_int(packet));
