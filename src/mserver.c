@@ -1,13 +1,16 @@
 #include "mserver.h"
 
-#include <arpa/inet.h>
+#include <bits/types/struct_iovec.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <netinet/in.h>
-#include <sys/socket.h>
+#include <arpa/inet.h>
+
+#include "packet.h"
 
 void mserver_setup(MSS) {
 	#define SSA serv->server_address
@@ -58,12 +61,40 @@ void mserver_start(MSS) {
 			exit(EXIT_FAILURE);
 		}
 
-		printf("Accepted client %d, IP: %s, PORT: %d", client_fd, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
+		printf("Accepted client %d, IP: %s, PORT: %d\n", client_fd, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
+		
+		uint8_t buffer[1024];
+		int len = recv(client_fd, buffer, sizeof(buffer), 0);
+    if (len <= 0) {
+        perror("recv");
+        close(client_fd);
+        exit(EXIT_FAILURE);
+    }
+
+		printf("Recived packet: ");
+		for (int i = 0; i < len; ++i) {
+			printf("%02x ", buffer[i]);
+		}
+		printf("\n");
+
+		m_Packet *packet = m_Packet_constructor(len);
+		packet->data = buffer;
+
+		printf("Packet lenght: %d\n", m_Packet_read_int(packet));
+		printf("Packet ID: 0x%02x\n", m_Packet_read_int(packet));
+		printf("Protocol: %d\n", m_Packet_read_int(packet));
+		printf("Address: %s\n", m_Packet_read_string(packet));
+		printf("Port: %d\n", m_Packet_read_short(packet));
+		printf("Next state: %d\n", m_Packet_read_int(packet));
+
+		free(packet);
 
 		close(client_fd);
 	}
 }
 
 void mserver_close(MSS) {
-	close(serv->server_fd);
+	if (close(serv->server_fd) == -1) {
+		printf("Error close server socket: %s\n", strerror(errno));
+	} 
 }
