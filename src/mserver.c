@@ -69,22 +69,30 @@ void mserver_start(MSS) {
         perror("recv");
         close(client_fd);
         exit(EXIT_FAILURE);
-    }
+    }	
 
-		printf("Recived packet: ");
-		for (int i = 0; i < len; ++i) {
-			printf("%02x ", buffer[i]);
-		}
-		printf("\n");
+		m_Packet *packet = m_Packet_constructor(buffer, len);	
 
-		m_Packet *packet = m_Packet_constructor(buffer, len);
+		packet = m_Packet_empty();
+		m_Packet_write_int(packet, 0x00);
+		m_Packet_write_string(packet, "{\"version\":{\"name\":\"MineC\",\"protocol\":765},\"players\":{\"max\":100,\"online\":5,\"sample\":[]},\"description\":{\"text\":\"Welcome to MineC!\"}}");
+		m_Packet_write_lenght(packet);
 
-		printf("Packet lenght: %d\n", m_Packet_read_int(packet));
-		printf("Packet ID: 0x%02x\n", m_Packet_read_int(packet));
-		printf("Protocol: %d\n", m_Packet_read_int(packet));
-		printf("Address: %s\n", m_Packet_read_string(packet));
-		printf("Port: %d\n", m_Packet_read_short(packet));
-		printf("Next state: %d\n", m_Packet_read_int(packet));
+		send(client_fd, packet->data, packet->pos, 0);	
+
+		memset(buffer, 0, sizeof(buffer));
+
+		len = recv(client_fd, buffer, sizeof(buffer), 0);
+
+		packet = m_Packet_constructor(buffer, len);	
+
+		send(client_fd, buffer, 2, 0);
+
+		len = recv(client_fd, buffer, sizeof(buffer), 0);
+
+		packet = m_Packet_constructor(buffer, len);	
+
+		// Response ping	
 
 		free(packet);
 
