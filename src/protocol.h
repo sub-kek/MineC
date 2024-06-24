@@ -5,5 +5,6 @@ enum packet_id : unsigned int {
 };
 
 enum status_id : unsigned int {
-	SI_STATUS = 1
+	SI_STATUS = 1,
+	SI_LOGIN = 2,
 };
