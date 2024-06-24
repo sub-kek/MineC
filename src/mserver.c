@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "packet.h"
+#include "connection.h"
 
 void mserver_setup(MSS) {
 	#define SSA serv->server_address
@@ -62,39 +62,9 @@ void mserver_start(MSS) {
 		}
 
 		printf("Accepted client %d, IP: %s, PORT: %d\n", client_fd, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
-		
-		uint8_t buffer[1024];
-		int len = recv(client_fd, buffer, sizeof(buffer), 0);
-    if (len <= 0) {
-        perror("recv");
-        close(client_fd);
-        exit(EXIT_FAILURE);
-    }	
 
-		m_Packet *packet = m_Packet_constructor(buffer, len);	
-
-		packet = m_Packet_empty();
-		m_Packet_write_int(packet, 0x00);
-		m_Packet_write_string(packet, "{\"version\":{\"name\":\"MineC\",\"protocol\":765},\"players\":{\"max\":100,\"online\":5,\"sample\":[]},\"description\":{\"text\":\"Welcome to MineC!\"}}");
-		m_Packet_write_lenght(packet);
-
-		send(client_fd, packet->data, packet->pos, 0);	
-
-		memset(buffer, 0, sizeof(buffer));
-
-		len = recv(client_fd, buffer, sizeof(buffer), 0);
-
-		packet = m_Packet_constructor(buffer, len);	
-
-		send(client_fd, buffer, 2, 0);
-
-		len = recv(client_fd, buffer, sizeof(buffer), 0);
-
-		packet = m_Packet_constructor(buffer, len);	
-
-		// Response ping	
-
-		free(packet);
+		m_Connection *con = m_Connection_constructor(client_fd);
+		m_Connection_handle_connection(con);
 
 		close(client_fd);
 	}
