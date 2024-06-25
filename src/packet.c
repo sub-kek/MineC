@@ -1,7 +1,5 @@
 #include "packet.h"
 
-#include <bits/types/struct_iovec.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -59,6 +57,16 @@ uint32_t m_Packet_read_varint(m_Packet *pck) {
 	} while (read & 0x80);
 
 	return result;
+}
+
+UUID *m_Packet_read_UUID(m_Packet *pck) {
+	UUID *uuid = malloc(sizeof(*uuid));
+
+	for (size_t i = 0; i < 16; i++) {
+    *uuid[i] = m_Packet_read_byte(pck);
+  }
+
+	return uuid;
 }
 
 char *m_Packet_read_string(m_Packet *pck) {

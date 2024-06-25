@@ -1,14 +1,13 @@
 #include "mserver.h"
 
-#include <bits/types/struct_iovec.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/socket.h>
 #include <unistd.h>
-#include <errno.h>
-#include <string.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <string.h>
+#include <errno.h>
 
 #include "connection.h"
 
@@ -25,6 +24,11 @@ void mserver_setup(MSS) {
 		printf("Error creating socket: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+	
+	uint8_t *val = malloc(sizeof(*val));
+	*val = 1;
+	setsockopt(serv->server_fd, SOL_SOCKET, SO_REUSEADDR, val, sizeof(*val));
+	free(val);
 
 	printf("Socket created.\n");
 }

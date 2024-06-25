@@ -1,10 +1,10 @@
 #include "connection.h"
 
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "packet.h"
 #include "protocol.h"
@@ -39,16 +39,27 @@ void m_Connection_write(m_Connection *con, m_Packet *pck) {
 
 void m_Connection_handle_connection(m_Connection *con) {
 	m_Packet *handshake_pck = m_Connection_read(con);
-	uint32_t pck_len = m_Packet_read_varint(handshake_pck);
-	uint32_t pck_id = m_Packet_read_varint(handshake_pck);	
+	/*uint32_t pck_len =*/ m_Packet_read_varint(handshake_pck);
+	uint32_t pck_id = m_Packet_read_varint(handshake_pck);
+	/*uint32_t pck_proto =*/ m_Packet_read_varint(handshake_pck);
+	/*char *pck_address =*/ m_Packet_read_string(handshake_pck);
+	/*uint16_t pck_port =*/ m_Packet_read_short(handshake_pck);
+	con->next_state = m_Packet_read_varint(handshake_pck);
 
-	switch (pck_id) {
-		case PI_HANDSHAKE:
-			handshake_pck->pos = 0;
-			m_Handler_handle_handshake(con, handshake_pck);
-		break;
-		default:
-			printf("Unimplemented packet id: 0x%02x with len: %d\n", pck_id, pck_len);
-		break;
+	handshake_pck->pos = 0;
+
+	if (pck_id == PI_HANDSHAKE) {
+		switch (con->next_state) {
+			case SI_STATUS: {
+				m_Handler_handle_status(con, nullptr);
+
+				break;
+			}
+			case SI_LOGIN: {
+				m_Handler_handle_login(con, nullptr);	
+
+				break;
+			}
+		}
 	}
 }
