@@ -1,4 +1,5 @@
 #include "packet.h"
+#include "mtypes.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -59,14 +60,12 @@ uint32_t m_Packet_read_varint(m_Packet *pck) {
 	return result;
 }
 
-UUID *m_Packet_read_UUID(m_Packet *pck) {
-	UUID *uuid = malloc(sizeof(*uuid));
+void m_Packet_read_UUID(m_Packet *pck, uuid_t *out) {
+	out = malloc(sizeof(uuid_t));
 
 	for (size_t i = 0; i < 16; i++) {
-    *uuid[i] = m_Packet_read_byte(pck);
-  }
-
-	return uuid;
+    *out[i] = m_Packet_read_byte(pck);
+  }	
 }
 
 char *m_Packet_read_string(m_Packet *pck) {

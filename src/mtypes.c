@@ -1,7 +1,9 @@
 #include "mtypes.h"
+
+#include <stdlib.h>
 #include <stdio.h>
 
-char *uuid_to_string(UUID uuid) {
+char *uuid_to_string(uuid_t uuid) {
 	char *str = malloc(37);
 
 	sprintf(str, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",

@@ -1,8 +1,6 @@
 #pragma once
 
-#include <stdlib.h>
-#include <stdint.h>
+#undef uuid_t
+typedef unsigned char uuid_t[16];
 
-typedef unsigned char UUID[16];
-
-char *uuid_to_string(UUID uuid);
+char *uuid_to_string(uuid_t uuid);
