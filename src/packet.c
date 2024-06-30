@@ -1,25 +1,26 @@
 #include "packet.h"
 #include "mtypes.h"
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-m_Packet *m_Packet_constructor(uint8_t *data, uint32_t size) {
-	m_Packet *pck = malloc(sizeof(*pck));
-	
-	pck->size = size;
-	pck->pos	= 0;
-	pck->data	= data;
+m_Packet m_Packet_constructor(uint8_t *data, uint32_t size) {
+	m_Packet pck = {
+		.size = size,
+		.pos = 0,
+		.data = data,
+	};
 
 	return pck;
 }
 
-m_Packet *m_Packet_empty() {
-	m_Packet *pck = malloc(sizeof(*pck));
-
-	pck->size = 65535;
-	pck->pos	= 0;
-	pck->data = malloc(65535);
+m_Packet m_Packet_empty() {
+	m_Packet pck = {
+		.size = 65635,
+		.pos = 0,
+		.data =malloc(65535),
+	};
 
 	return pck;
 }
@@ -61,11 +62,10 @@ uint32_t m_Packet_read_varint(m_Packet *pck) {
 }
 
 void m_Packet_read_UUID(m_Packet *pck, uuid_t *out) {
-	out = malloc(sizeof(uuid_t));
-
-	for (size_t i = 0; i < 16; i++) {
-    *out[i] = m_Packet_read_byte(pck);
-  }	
+	uint64_t mostSigBits = m_Packet_read_long(pck);
+	uint64_t leastSigBits = m_Packet_read_long(pck);
+	memcpy(out, &mostSigBits, sizeof(mostSigBits));
+	memcpy(out + sizeof(mostSigBits), &leastSigBits, sizeof(leastSigBits));
 }
 
 char *m_Packet_read_string(m_Packet *pck) {
@@ -81,10 +81,10 @@ char *m_Packet_read_string(m_Packet *pck) {
 }
 
 void m_Packet_write_lenght(m_Packet *pck) {
-	m_Packet *tpck = m_Packet_empty();
-	m_Packet_write_varint(tpck, pck->pos);	
+	m_Packet tpck = m_Packet_empty();
+	m_Packet_write_varint(&tpck, pck->pos);	
 
-	for (uint32_t i = 0; i < tpck->pos; i++) {
+	for (uint32_t i = 0; i < tpck.pos; i++) {
 		for (uint32_t j = pck->pos + 1; j > 0; j--) {
 			pck->data[j] = pck->data[j - 1];
 		}
@@ -93,8 +93,7 @@ void m_Packet_write_lenght(m_Packet *pck) {
 	uint32_t data_size = pck->pos;
 	pck->pos = 0;
 	m_Packet_write_varint(pck, data_size);
-	pck->pos = data_size + tpck->pos;
-	free(tpck);
+	pck->pos = data_size + tpck.pos;
 }
 
 void m_Packet_write_byte(m_Packet *pck, uint8_t value)

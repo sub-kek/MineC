@@ -4,30 +4,26 @@
 
 #include "mserver.h"
 
-mserver *serv;
+mserver serv;
 
 void handle_interrupt(int signum) {
 	printf("\nProgram interrupted by user.\n");
 
-	mserver_close(serv);
-	free(serv);
+	mserver_close(&serv);
 
 	exit(signum);
 }
 
 int main() {
 	signal(SIGINT, handle_interrupt);
-
-	serv = malloc(sizeof(*serv));
 	
 	printf("Starting server.\n");
-	mserver_setup(serv);
-	mserver_bind(serv);
+	mserver_setup(&serv);
+	mserver_bind(&serv);
 
-	mserver_start(serv);
+	mserver_start(&serv);
 	
-	mserver_close(serv);
-	free(serv);
+	mserver_close(&serv);
 
 	exit(EXIT_SUCCESS);
 }

@@ -10,8 +10,8 @@ typedef struct {
 	unsigned int size;
 } m_Packet;
 
-m_Packet *m_Packet_constructor(uint8_t *data, uint32_t size);
-m_Packet *m_Packet_empty();
+m_Packet m_Packet_constructor(uint8_t *data, uint32_t size);
+m_Packet m_Packet_empty();
 
 uint8_t m_Packet_read_byte(m_Packet *pck);
 uint16_t m_Packet_read_short(m_Packet *pck);

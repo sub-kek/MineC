@@ -67,8 +67,8 @@ void mserver_start(MSS) {
 
 		printf("Accepted client %d, IP: %s, PORT: %d\n", client_fd, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
 
-		m_Connection *con = m_Connection_constructor(client_fd);
-		m_Connection_handle_connection(con);
+		m_Connection con = m_Connection_constructor(client_fd);
+		m_Connection_handle_connection(&con);
 
 		close(client_fd);
 	}
