@@ -2,6 +2,10 @@ BUILD_DIR = build
 
 minec: cmake_setup cmake_compile compiler_setup run
 
+favicon:
+	@read -p "Enter favicon[0-2]: " favnum; \
+	ln -sf favicon$$favnum.png favicon.png
+
 cmake_setup:
 	cmake -DCMAKE_BUILD_TYPE:STRING=Debug -S . -B ./build -G Ninja
 
@@ -17,15 +21,9 @@ run:
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -f compile_commands.json
+	rm -f favicon.png
 
-favicon0:
-	ln -sf $@.png favicon.png
 
-favicon1:
-	ln -sf $@.png favicon.png
-
-favicon2:
-	ln -sf $@.png favicon.png
 
 .DEFAULT_GOAL := minec
-.PHONY: minec cmake_setup cmake_compile compiler_setup run clean favicon0 favicon1 favicon2
+.PHONY: minec cmake_setup cmake_compile compiler_setup run clean favicon
