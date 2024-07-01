@@ -7,7 +7,7 @@ favicon:
 	ln -sf favicon$$favnum.png favicon.png
 
 cmake_setup:
-	cmake -DCMAKE_BUILD_TYPE:STRING=Debug -S . -B ./build -G Ninja
+	cmake -DCMAKE_BUILD_TYPE:STRING=Release -S . -B ./build -G Ninja
 
 cmake_compile:
 	cmake --build ./build -j 12

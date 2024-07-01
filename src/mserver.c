@@ -1,6 +1,5 @@
 #include "mserver.h"
 
-#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/socket.h>

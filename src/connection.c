@@ -21,13 +21,10 @@ m_Connection m_Connection_constructor(int client_fd) {
 }
 
 m_Packet m_Connection_read(m_Connection *con) {
-	m_Packet pck = m_Packet_empty();
-	
 	memset(con->buffer, 0, BUFFER_SIZE);
 	
-	pck.size = read(con->client_fd, con->buffer, BUFFER_SIZE);
-	pck.data = malloc(pck.size);
-	memcpy(pck.data, con->buffer, pck.size);
+	size_t bytes_readed = read(con->client_fd, con->buffer, BUFFER_SIZE);
+	m_Packet pck = m_Packet_constructor(con->buffer, bytes_readed);
 
 	return pck;
 }
@@ -41,7 +38,8 @@ void m_Connection_handle_connection(m_Connection *con) {
 	/*uint32_t pck_len =*/ m_Packet_read_varint(&handshake_pck);
 	uint32_t pck_id = m_Packet_read_varint(&handshake_pck);
 	/*uint32_t pck_proto =*/ m_Packet_read_varint(&handshake_pck);
-	/*char *pck_address =*/ m_Packet_read_string(&handshake_pck);
+	char *pck_address = m_Packet_read_string(&handshake_pck);
+	free(pck_address);
 	/*uint16_t pck_port =*/ m_Packet_read_short(&handshake_pck);
 	con->next_state = m_Packet_read_varint(&handshake_pck);
 
@@ -61,4 +59,7 @@ void m_Connection_handle_connection(m_Connection *con) {
 			}
 		}
 	}
+
+	m_Packet_cleanup(&handshake_pck);
+	free(con->buffer);
 }

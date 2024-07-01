@@ -9,8 +9,10 @@ m_Packet m_Packet_constructor(uint8_t *data, uint32_t size) {
 	m_Packet pck = {
 		.size = size,
 		.pos = 0,
-		.data = data,
 	};
+	
+	pck.data = malloc(size);
+	memcpy(pck.data, data, size);
 
 	return pck;
 }
@@ -23,6 +25,14 @@ m_Packet m_Packet_empty() {
 	};
 
 	return pck;
+}
+
+void m_Packet_cleanup(m_Packet *pck) {
+    free(pck->data);
+
+    pck->size = 0;
+    pck->pos = 0;
+    pck->data = NULL;
 }
 
 uint8_t m_Packet_read_byte(m_Packet *pck)
@@ -47,8 +57,7 @@ uint64_t m_Packet_read_long(m_Packet *pck) {
 }
 
 uint32_t m_Packet_read_varint(m_Packet *pck) {
-	uint32_t	result = 0,
-						shift = 0;
+	uint32_t result = 0, shift = 0;
 
 	uint8_t read;
 
@@ -69,13 +78,15 @@ void m_Packet_read_UUID(m_Packet *pck, uuid_t *out) {
 }
 
 char *m_Packet_read_string(m_Packet *pck) {
-	uint32_t lenght = m_Packet_read_varint(pck);
+	uint32_t length = m_Packet_read_varint(pck);
 
-	char *string = malloc(lenght);
+	char *string = malloc(length + 1);
 
-	for (uint32_t i = 0; i < lenght; i++) {
+	for (uint32_t i = 0; i < length; i++) {
 		string[i] = m_Packet_read_byte(pck);
 	}
+
+	string[length] = '\0';
 
 	return string;
 }

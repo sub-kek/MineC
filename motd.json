@@ -5,11 +5,20 @@
     },
     "players": {
         "max": 100,
-        "online": 4,
-        "sample": []
+        "online": 2,
+        "sample": [
+            {
+                "name": "\u00a76The MineC Dev",
+                "id": "00000000-0000-0000-0000-000000000000"
+            },
+            {
+                "name": "\u00a7dsubkek",
+                "id": "00000000-0000-0000-0000-000000000001"
+            }
+        ]
     },
     "description": {
-        "text": "\u00a7bMinecraft server on C LANGUAGE!"
+        "text": "\u00a7bMinecraft server on CLANG!"
     },
     "favicon":"data:image/png;base64,%s"
 }

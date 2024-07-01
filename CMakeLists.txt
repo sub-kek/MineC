@@ -11,11 +11,10 @@ file(GLOB_RECURSE MineC_SOURCES "src/*.c")
 
 add_executable(MineC ${MineC_HEADERS} ${MineC_SOURCES})
 
-find_package(PNG REQUIRED)
 find_package(OpenSSL REQUIRED)
 add_subdirectory("libs/jsonc")
 
-target_link_libraries(MineC PRIVATE ${PNG_LIBRARIES} ${OPENSSL_LIBRARIES} json-c)
-target_include_directories(MineC PRIVATE ${PNG_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIRS} "libs/jsonc")
+target_link_libraries(MineC PRIVATE ${OPENSSL_LIBRARIES} json-c)
+target_include_directories(MineC PRIVATE ${OPENSSL_INCLUDE_DIRS} "libs/jsonc")
 
 target_compile_options(MineC PRIVATE -Wall -Wextra -Wpedantic)
