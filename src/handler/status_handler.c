@@ -1,23 +1,31 @@
 #include "handler.h"
 
 #include <stdio.h>
+#include <string.h>
+#include <json-c/json.h>
 
 #include "../protocol.h"
 #include "../connection.h"
+#include "../mfile.h"
+
 
 void m_Handler_handle_status(m_Connection *con, m_Packet*) {
 	m_Packet rpck = m_Packet_empty();
 	m_Packet_write_varint(&rpck, PI_HANDSHAKE);	
 
-	FILE *file = fopen("motd.json", "ro");
-	fseek(file, 0, SEEK_END);
-	size_t size = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	char buf[size];
-	fread(buf, sizeof(char), size, file);
-	fclose(file);
+	struct json_object *motd_object = json_object_from_file("motd.json");
+	char *motd = (char*)json_object_to_json_string_ext(motd_object, JSON_C_TO_STRING_PLAIN);
 
-	m_Packet_write_string(&rpck, buf);
+	size_t favicon_size;
+	char *favicon = mread_file("favicon.png", &favicon_size); 
+	char *favicon_base64 = mbase64_encode(favicon, favicon_size); 
+
+	size_t both_size = strlen(motd) + strlen(favicon_base64);
+
+	char json_buf[both_size];
+	snprintf(json_buf, both_size, motd, favicon_base64);
+
+	m_Packet_write_string(&rpck, json_buf);
 
 	m_Packet_write_lenght(&rpck);
 			

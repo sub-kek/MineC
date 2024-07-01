@@ -1,19 +1,31 @@
-generate_release:
-	cmake -DCMAKE_BUILD_TYPE:STRING=Debug -S . -B ./build -G Ninja
-	ln -sf ./build/compile_commands.json ./
+BUILD_DIR = build
 
-release:
-	$(MAKE) generate_release
+minec: cmake_setup cmake_compile compiler_setup run
+
+cmake_setup:
+	cmake -DCMAKE_BUILD_TYPE:STRING=Debug -S . -B ./build -G Ninja
+
+cmake_compile:
 	cmake --build ./build -j 12
 
-clean:
-	rm -rf build
-	rm -f compile_commands.json
+compiler_setup:
+	ln -sf $(BUILD_DIR)/compile_commands.json .
 
 run:
-	./build/MineC
+	$(BUILD_DIR)/MineC
 
-all:
-	$(MAKE) clean
-	$(MAKE) release
-	$(MAKE) run
+clean:
+	rm -rf $(BUILD_DIR)
+	rm -f compile_commands.json
+
+favicon0:
+	ln -sf $@.png favicon.png
+
+favicon1:
+	ln -sf $@.png favicon.png
+
+favicon2:
+	ln -sf $@.png favicon.png
+
+.DEFAULT_GOAL := minec
+.PHONY: minec cmake_setup cmake_compile compiler_setup run clean favicon0 favicon1 favicon2

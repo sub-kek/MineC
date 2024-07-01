@@ -22,13 +22,16 @@ void mserver_setup(MSS) {
 
 	if ((serv->server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
 		printf("Error creating socket: %s\n", strerror(errno));
+		mserver_close(serv);
 		exit(EXIT_FAILURE);
 	}
 	
-	uint8_t *val = malloc(sizeof(*val));
-	*val = 1;
-	setsockopt(serv->server_fd, SOL_SOCKET, SO_REUSEADDR, val, sizeof(*val));
-	free(val);
+	int val = 1;
+	if (setsockopt(serv->server_fd, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val)) == -1) {
+		printf("Error set socket options: %s\n", strerror(errno));
+		mserver_close(serv);
+		exit(EXIT_FAILURE);
+	}
 
 	printf("Socket created.\n");
 }
@@ -36,6 +39,7 @@ void mserver_setup(MSS) {
 void mserver_bind(MSS) {
 	if (bind(serv->server_fd, (SA*)&serv->server_address, serv->server_address_len) == -1) {
 		printf("Error bind socket: %s\n", strerror(errno));
+		mserver_close(serv);
 		exit(EXIT_FAILURE);
 	}
 
@@ -45,7 +49,6 @@ void mserver_bind(MSS) {
 void mserver_start(MSS) {
 	if (listen(serv->server_fd, 0) == -1) {
 		printf("Listen error: %s\n", strerror(errno));
-
 		mserver_close(serv);
 		exit(EXIT_FAILURE);
 	}
@@ -59,7 +62,6 @@ void mserver_start(MSS) {
 
 		if (client_fd == -1) {
 			printf("Error accept client: %s\n", strerror(errno));
-			
 			close(client_fd);
 			mserver_close(serv);
 			exit(EXIT_FAILURE);
@@ -77,5 +79,6 @@ void mserver_start(MSS) {
 void mserver_close(MSS) {
 	if (close(serv->server_fd) == -1) {
 		printf("Error close server socket: %s\n", strerror(errno));
+		exit(EXIT_FAILURE);
 	} 
 }
